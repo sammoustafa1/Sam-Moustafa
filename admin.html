@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#153537">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="لوحة إدارة خاصة بموقع سام مصطفى العقاري.">
+  <title>لوحة الإدارة | Sam Moustafa</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+  <script src="supabase-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js" defer></script>
+</head>
+<body class="admin-page">
+  <header class="admin-topbar">
+    <a class="brand admin-brand" href="index.html">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-copy"><strong>Sam Moustafa</strong><small>إدارة الموقع</small></span>
+    </a>
+    <a class="admin-back-link" href="index.html">العودة إلى الموقع <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main class="admin-shell">
+    <p class="admin-status" id="adminStatus" role="status" aria-live="polite"></p>
+
+    <section class="admin-setup-note" id="setupNotice" hidden>
+      <h1>اللوحة تحتاج إلى إعداد Supabase</h1>
+      <p>أضف رابط المشروع ومفتاح النشر العام في <code>supabase-config.js</code>، ثم شغّل تعليمات قاعدة البيانات الموجودة في <code>supabase/schema.sql</code>.</p>
+    </section>
+
+    <section class="admin-login-card" id="loginView">
+      <p class="admin-eyebrow">مساحة خاصة</p>
+      <h1>تسجيل دخول الإدارة</h1>
+      <p class="admin-muted">سجّل الدخول بالبريد وكلمة المرور المضافة في Supabase Auth.</p>
+      <form id="loginForm">
+        <label class="admin-field">
+          <span>البريد الإلكتروني</span>
+          <input name="email" type="email" autocomplete="username" maxlength="254" required>
+        </label>
+        <label class="admin-field">
+          <span>كلمة المرور</span>
+          <input name="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="admin-primary-button" type="submit">دخول آمن <span aria-hidden="true">↗</span></button>
+      </form>
+    </section>
+
+    <section class="admin-dashboard" id="dashboardView" hidden>
+      <div class="admin-heading-row">
+        <div>
+          <p class="admin-eyebrow">إدارة الموقع</p>
+          <h1>أهلًا بك في لوحة التحكم</h1>
+          <p class="admin-muted">الرسائل والعقارات هنا خاصة، ولا تظهر للزوار إلا العقارات المنشورة.</p>
+        </div>
+        <button class="admin-secondary-button" id="signOutButton" type="button">تسجيل الخروج</button>
+      </div>
+
+      <div class="admin-stats" aria-label="ملخص الموقع">
+        <article class="admin-stat-card"><strong id="leadStat">0</strong><span>رسائل العملاء</span></article>
+        <article class="admin-stat-card"><strong id="unreadStat">0</strong><span>رسائل غير مقروءة</span></article>
+        <article class="admin-stat-card"><strong id="publishedStat">0</strong><span>عقارات منشورة</span></article>
+      </div>
+
+      <nav class="admin-tabs" aria-label="أقسام لوحة التحكم">
+        <button class="admin-tab is-active" type="button" data-admin-tab="leadsPanel" aria-selected="true">الرسائل</button>
+        <button class="admin-tab" type="button" data-admin-tab="propertiesPanel" aria-selected="false">العقارات والصور</button>
+      </nav>
+
+      <section class="admin-panel" id="leadsPanel">
+        <div class="admin-panel-heading">
+          <div><h2>رسائل العملاء</h2><p class="admin-muted">الرسائل لا يمكن للزوار قراءتها.</p></div>
+          <button class="admin-secondary-button" id="refreshLeadsButton" type="button">تحديث</button>
+        </div>
+        <div class="admin-list" id="leadsList"></div>
+      </section>
+
+      <section class="admin-panel" id="propertiesPanel" hidden>
+        <div class="admin-panel-heading">
+          <div><h2>العقارات والصور</h2><p class="admin-muted">أضف صورة ووصفًا، ثم انشر العقار ليظهر في الموقع.</p></div>
+          <button class="admin-secondary-button" id="refreshPropertiesButton" type="button">تحديث</button>
+        </div>
+        <div class="admin-manager-layout">
+          <form class="admin-editor" id="propertyForm">
+            <h3 id="propertyFormTitle">إضافة عقار</h3>
+            <label class="admin-field">
+              <span>عنوان العقار</span>
+              <input name="title" type="text" maxlength="160" required>
+            </label>
+            <label class="admin-field">
+              <span>الموقع</span>
+              <input name="location" type="text" maxlength="200" required>
+            </label>
+            <label class="admin-field">
+              <span>الحالة</span>
+              <select name="status" required>
+                <option value="available">متاح</option>
+                <option value="under_contract">تحت العقد</option>
+                <option value="closed">تم الإغلاق</option>
+              </select>
+            </label>
+            <label class="admin-field">
+              <span>تعليق أو وصف الصورة</span>
+              <textarea name="description" rows="4" maxlength="2000"></textarea>
+            </label>
+            <label class="admin-field">
+              <span>صورة العقار</span>
+              <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif">
+              <small>JPG أو PNG أو WebP أو AVIF، حتى 8 ميجابايت.</small>
+            </label>
+            <p class="admin-current-image" id="currentImageNote" hidden></p>
+            <label class="admin-publish-toggle">
+              <input name="is_published" type="checkbox" checked>
+              <span>نشر العقار على الموقع</span>
+            </label>
+            <div class="admin-form-actions">
+              <button class="admin-primary-button" type="submit" id="savePropertyButton">حفظ العقار</button>
+              <button class="admin-secondary-button" type="button" id="cancelEditButton" hidden>إلغاء التعديل</button>
+            </div>
+          </form>
+          <div class="admin-list admin-property-list" id="propertiesList"></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="admin-footer">
+    <span>لوحة خاصة — لا تشارك بيانات الدخول.</span>
+    <a href="index.html">العودة إلى الموقع</a>
+  </footer>
+</body>
+</html>
