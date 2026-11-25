@@ -1,4 +1,4 @@
 window.SITE_CONFIG = {
-  supabaseUrl: 'npm install @supabase/supabase-js @supabase/ssr',
-  supabaseAnonKey: 'supabaseUrl: 'https://xjofozzcghxdgwviaquq.supabase.co','
+  supabaseUrl: 'https://xJofvzzighwxpwviaquq.supabase.co',
+  supabaseAnonKey: 'حط_هنا_مفتاح_anon_public_بتاعك'
 };
